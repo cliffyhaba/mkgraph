@@ -1,6 +1,8 @@
 #!/usr/bin/ruby
 
+require 'rubygems'
 require 'ruby-graphviz'
+require 'tree'
 
 # Hold a list of classes
 class MakeArray
@@ -21,6 +23,8 @@ class MakeArray
 
 end
 
+me = File::basename($0)
+# t = Tree
 # The array to contain the class list
 mk_ary = MakeArray.new
 
@@ -33,57 +37,89 @@ end_count = 0
 end_expected = 0                  # how many ends before class end
 class_end_expected = 0            # how many class ends we expect (internal definitions)
 
+
+#######################
+root_node = Tree::TreeNode.new("START", "The calling program")
+
+=begin
+begin
+  # ..... Now insert the child nodes.  Note that you can "chain" the child insertions for a given path to any depth.
+  root_node << Tree::TreeNode.new("CHILD1", "Child1 Content abc ") << Tree::TreeNode.new("GRANDCHILD1", "GrandChild1 Content")
+  root_node << Tree::TreeNode.new("CHILD2", "Child2 Content def ")
+rescue Exception => e
+  # print e.message + "\n"
+  nil
+end
+grand_child1 = root_node["CHILD1"]["GRANDCHILD1"]
+child2 = root_node["CHILD2"]
+
+grand_child1 << Tree::TreeNode.new("abcdef", "abc")
+grand_child1 << Tree::TreeNode.new("ghijkl", "abc") << Tree::TreeNode.new("ghijkl", "abc")
+child2 << Tree::TreeNode.new("abcdef", "abc")
+root_node.print_tree
+
+exit 0
+=end
+
+#######################
+
+cname = ""
+in_class = false
+
 Dir.glob("**/*.rb") do |file| # note one extra "*" for recursion
 
-  next if file == '.' or file == '..'
+  next if file == '.' or file == '..' or file == me
 
-  # puts "working on: #{file}..."
   File.open(file) do |f|
     f.each_line do |line|
-      # print "cee = " + class_end_expected.to_s + " ee " + end_expected.to_s + "\n"
+
       case line
+      when /\.new/
+        name = line.split('.')
+        cname = name[0]
+        print "cname = " + cname + "\n"
+        if name[0] != nil
+          print "Class Instance " + name[0] + "\n"
+        end
       when /^\s*#/
         nil
       when /^\s*elsif/
         nil
       when /^\s*class[\s]+/
-        mk_ary.add line.split(' ')[1], file
+        cname = line.split(' ')[1]
+        mk_ary.add cname, file
         class_end_expected += 1
-        # print "class LINE: cee = " + class_end_expected.to_s + " ce = " + end_expected.to_s + " line = " + line
+        in_class = true
+        print "Start of class " + cname + "\n"
       when /^\s*begin/
-        # print "begin\n"
         end_expected += 1
       when /^.*if /
-        # print "if\n"
         end_expected += 1
       when /^\s*def /
         end_expected += 1
-        # print "def cee = " + class_end_expected.to_s + "  " + "ce = " + end_expected.to_s + "\n"
       when /^.* do/
-        # print "do - " + line + "\n"
         end_expected += 1
       when /^\s*case/
-        # print "case\n"
         end_expected += 1
       when /^\s*end[\s.]/
-        # print "An End " + line
         if end_expected == 0
           if class_end_expected > 0
             class_end_expected -= 1
-            mk_ary.add "End", file
-            # print "END OF CLASS LINE:: " + line
+            in_class = false
+            print "End of class " + cname + "\n"
           end
         else
           end_expected -= 1
         end
-        # print "END: cee = " + class_end_expected.to_s + " ce = " + end_expected.to_s + " line = " + line
       end      # case
     end
   end
 end
 
 # Print the list of classes
-mk_ary.list
+# mk_ary.list
+
+
 
 
 # sort_ary ary
