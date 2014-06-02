@@ -1,0 +1,5 @@
+
+    d = A.new
+
+
+grand_child1 << Tree::TreeNode.new("ghijkl", "abc") << Tree::TreeNode.new("ghijkl", "abc")

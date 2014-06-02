@@ -7,7 +7,8 @@ require 'tree'
 begin
   file_pattern = ARGV[0]
 rescue
-  file_pattern = "**/*.rb"
+file_pattern = "**/*.rb"
+# file_pattern = "test.rb"
 end
 
 me = File::basename($0)
@@ -32,18 +33,18 @@ parent_class_name = nil
 print_parent = true
 
 def find_leaf root, sname
-
+  
   print "find_leaf searching for: [" + sname + "] This Root is " + root.name + "\n"
   r = root
-
+  
   if root != nil && root.name != sname
-    root.children { |child|
+    root.children { |child|    
       r = find_leaf child, sname
-      break if r.name == sname
+      break if r.name == sname  
     }
   else
     print "NIL OR FOUND [" + root.name + "]\n"
-    r = root
+    r = root  
   end
   print "find_leaf returning: [" + r.name + "]\n"
   r
@@ -61,7 +62,7 @@ def proc_node root, par, child, join_to_root
     end
   rescue Exception => e
     print e.message + "\n"
-    print "***** Processing node " + "None" + " --> " + child.to_s + "\n"
+    print "***** Processing node " + "None" + " --> " + child.to_s + "\n"    
   end
   # $root_node.printTree
   root
@@ -81,11 +82,11 @@ Dir.glob(file_pattern) do |file| # note one extra "*" for recursion
         name = line.split('.new')
         cname = name[0].split.last
         if in_class == true
-          # print "NEW INSTANCE OF CLASS = [" + cname + "] created in class " + parent_class_name + "\n"
+          # print "NEW INSTANCE OF CLASS = [" + cname + "] created in class " + parent_class_name + "\n"        
           tnode = proc_node tnode, parent_class_name, cname, false
         else
           if true == print_parent
-            # print "NEW INSTANCE OF CLASS = [" + cname + "] created outside any parent class\n"
+            # print "NEW INSTANCE OF CLASS = [" + cname + "] created outside any parent class\n"                  
             tnode = proc_node tnode, parent_class_name, cname, true
           end
         end
@@ -127,16 +128,15 @@ Dir.glob(file_pattern) do |file| # note one extra "*" for recursion
 end
 
 def make_g g, root
-  if root.has_children? == true
-    root.children { |child|
+  if root.hasChildren? == true
+    root.children { |child|      
       make_g g, child
     }
   end
   g.add_node root.name
-  g[:truecolor => true, :bgcolor => "cyan", :rankdir => "TB", :color => "red"]
-  if ! root.is_root?
+  if ! root.isRoot?
     # Add an edge to the parent
-    g.add_edge(root.parent.name, root.name, :label => root.parent.name + " uses " + root.name, :color => "blue", :fontcolor => "red")
+    g.add_edge(root.parent.name, root.name, :label => root.parent.name + " uses " + root.name, :color => "blue")    
   end
   g
 end
@@ -144,14 +144,13 @@ end
 begin  #make a dot file
 
   g = GraphViz.new( :G, :type => :digraph)
-  g[:truecolor => true, :bgcolor => "cyan", :rankdir => "TB", :color => "blue"]
 
   root = $root_node
-
+  
   # Add root and then recursively add all children of the root node
   g.add_node(root.name)
   g = make_g g, root
-
+    
   g.output( :png => "prog.png")
 
 end
