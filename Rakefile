@@ -1,0 +1,14 @@
+
+require 'rake/testtask'
+
+Rake::TestTask.new do |t|
+	Dir.chdir('test')
+  t.libs << "test"
+  t.test_files = FileList['test*.rb']
+  t.verbose = true
+end
+
+desc  "Run Unit Tests on Mkgraph"
+
+task  :default => [:test]
+

@@ -1,0 +1,11 @@
+Log Options:
+  format: brief 	# brief or full
+  output: stderr	# stderr, stdout or file name
+  level: WARN			# INFO, WARN or FATAL
+Labels:
+  root: Entry Point
+  root comment: The Root Comment
+Output:
+  image name: view.png
+Osdep:
+  viewer: eog
